@@ -1,0 +1,28 @@
+#include "tree.h"
+
+Var_Global * ajouter_varGlob(List_Var_Global *l,char *nom){
+ Var_Global * tmp=malloc(sizeof(Var_Global));
+  strcpy(tmp->label,nom);
+  tmp->blocs_top=NULL;
+  tmp->blocs_bottom=NULL;
+  tmp->next=NULL;
+  l->bottom->next=tmp;
+  l->bottom->bottom=tmp; 
+  return tmp;
+}
+
+
+void ajouter_fonction(List_Var_Global *l,char *nom){
+  Var_Global * tmp=ajouter_varGlob(l,nom);
+  tmp->type=-1;
+}
+
+void ajouter_varGlobF(List_Var_Global *l,char *nom){
+  Var_Global * tmp=ajouter_varGlob(l,nom);
+  tmp->type=2;
+}
+
+void ajouter_varGlobI(List_Var_Global *l,char *nom){
+  Var_Global * tmp=ajouter_varGlob(l,nom);
+  tmp->type=1;
+}

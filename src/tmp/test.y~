@@ -1,0 +1,104 @@
+%{
+  #include <stdio.h>
+  #include <stdlib.h> 
+  #include <string.h>
+  void inserer(char *,int);
+  int valueof(char*);
+  typedef struct element{
+  char nom[100];
+  int valeur;
+  struct element *suivant;
+ }Element;
+  typedef struct liste{
+  struct element *top;
+  struct element *bottom;
+ } Liste;
+  Liste variables;
+  Element first;
+  %}
+%union{
+  char *statement;
+  int value;
+}
+%token <statement> identifier
+%token <value> valeur
+%token <statement> print exit
+%type <value> Expression start term 
+%start start
+
+%%
+
+start : Expression ';' 
+| identifier '=' Expression ';' { inserer($1,$3); }
+| print Expression ';' { printf("%d\n",$2); }
+| print identifier ';' { printf("%d\n",valueof($2)); }
+| exit ';'  { exit(0); }
+;
+ 
+Expression:   Expression '+' term{ $$=$1+$3;}
+   | Expression '-' term  { $$=$1-$3; }
+   | Expression '*' term  { $$=$1*$3; }
+   | Expression '/' term  { $$=$1/$3; }
+   | term {$$=$1;}
+   ;
+
+term: valeur { $$=$1; };
+%%
+
+Element * trouver(char*statement){
+  Element curseur=*(variables.top);
+  while(strcmp(curseur.nom,statement) && curseur.suivant!=0){
+  curseur=*(curseur.suivant);
+ }
+  if (strcmp(curseur.nom,statement){
+  return null;
+ }else
+    return &curseur;
+ }
+}
+
+  void element_free(Element *e){
+  while (e->suivant){
+  element_free(e->suivant);
+ }
+  free(e);
+ }
+  void varibles_free(Liste varibles){
+  Element *tmp=variables.top;
+  if(tmp.suivant!=NULL){
+  element_free(tmp.suivant);
+ }
+ }
+
+void main(void){
+  variables.top=first;
+  first.suivant=NULL;
+  yyparse();
+  variables_free(variables);
+}
+
+ void inserer(char *statement,int val){
+  element * t=trouver(statement);
+  if (element!=NULL)
+    t->valeur=val;
+  else{
+  t=malloc(sizeof(element));
+  variables.bottom=t;
+  t.valeur=val;
+  t.suivant=NULL;
+ }
+}
+
+void yyerror (char *s) {fprintf (stderr, "%s\n", s);} 
+ int valueof(char*nom){
+  Element *tmp=trouver(statement);
+  if (tmp)
+    return tmp->valeur;
+  else{
+  yyerror("variable non trouvé");
+  exit(-1);
+ } 
+    
+ }
+
+
