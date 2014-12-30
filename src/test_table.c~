@@ -1,0 +1,15 @@
+#include "table.h"
+#include <assert.h>
+
+void test_ajouter_fonction(void){
+  List_Var_Global l=malloc(sizeof(List_Var_Global));
+  char nom="lol";
+  ajouter_fonction(l,nom);
+  assert(strcmp(l->top->nom,nom)==0);
+  assert(l->top->type==-1);
+  free_List_Var_Global(l);
+}
+
+void main(void){
+  test_ajouter_fonction();
+}
