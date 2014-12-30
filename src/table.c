@@ -23,7 +23,7 @@ Var_Global * ajouter_varGlob(List_Var_Global *l,char *nom){
 }
 
 
-List_Var *ajouter_fonction(List_Var_Global *l,char *nom,int type_retour){
+List_Var *ajouter_fonction(List_Var_Global *l,char *nom,char type_retour){
   Var_Global * tmp=ajouter_varGlob(l,nom);
   ajouter_block(tmp);
   tmp->type=-1;
@@ -34,13 +34,13 @@ List_Var *ajouter_fonction(List_Var_Global *l,char *nom,int type_retour){
 void ajouter_varGlobF(List_Var_Global *l,char *nom){
   Var_Global * tmp=ajouter_varGlob(l,nom);
   tmp->type=2;
-  tmp->type_retour=0;
+  tmp->type_retour=-1;
 }
 
 void ajouter_varGlobI(List_Var_Global *l,char *nom){
   Var_Global * tmp=ajouter_varGlob(l,nom);
   tmp->type=1;
-  tmp->type_retour=0;
+  tmp->type_retour=-1;
 }
 
 Var* ajouter_var(List_Var *l, char *nom,int offset){

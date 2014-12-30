@@ -35,7 +35,7 @@ typedef struct list_var{
 
 List_Var_Global *initialiser_list_var_global(void);
 
-List_Var *ajouter_fonction(List_Var_Global *l,char *nom,int type_retour);
+List_Var *ajouter_fonction(List_Var_Global *l,char *nom,char type_retour);
 void ajouter_varGlobF(List_Var_Global *l,char *nom);
 void ajouter_varGlobI(List_Var_Global *l,char *nom);
 
