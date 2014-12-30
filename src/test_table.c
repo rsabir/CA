@@ -80,10 +80,72 @@ void test_ajouter_varI(void){
   free_List_Var_Global(l);  
 }
 
+void test_ajouter_block(void){
+  List_Var_Global *l=initialiser_list_var_global();
+  char *nom="lol";
+  ajouter_fonction(l,nom);  
+  Var_Global *lol=l->top;
+  assert(lol->blocs_bottom==lol->blocs_top);
+  ajouter_block(lol);
+  assert(lol->blocs_bottom!=lol->blocs_top);
+  List_Var *tmp=lol->blocs_bottom;
+  ajouter_block(lol);
+  assert(lol->blocs_bottom!=tmp);
+  free_List_Var_Global(l);  
+}
+
+void test_trouver_localement(void){
+  List_Var_Global *l=initialiser_list_var_global();
+  char *nom="lol";
+  List_Var* lol_block=ajouter_fonction(l,nom);  
+  Var_Global *lol=l->top;
+  ajouter_varF(lol_block,"a",8);
+  ajouter_varI(lol_block,"b",8);
+  assert(trouver_localement(lol_block,"lol")==NULL);
+  assert(trouver_localement(lol_block,"a"));
+  assert(trouver_localement(lol_block,"b"));
+  List_Var* btmp=ajouter_block(lol);
+  ajouter_varF(btmp,"ab",8);
+  assert(trouver_localement(btmp,"lol")==NULL);
+  assert(trouver_localement(btmp,"a"));
+  assert(trouver_localement(btmp,"b"));
+  assert(trouver_localement(lol_block,"a"));
+  assert(trouver_localement(lol_block,"ab")==NULL);
+  List_Var* btmpp=ajouter_block(lol);
+  ajouter_varF(btmpp,"c",8);
+  assert(trouver_localement(btmp,"lol")==NULL);
+  assert(trouver_localement(btmpp,"b"));
+  assert(trouver_localement(btmpp,"a"));
+  assert(trouver_localement(btmpp,"ab"));
+  assert(trouver_localement(btmpp,"c"));
+  free_List_Var_Global(l);	 
+}
+
+void test_trouver_fonction(void){
+  List_Var_Global *l=initialiser_list_var_global();
+  char *nom="lol";
+  ajouter_fonction(l,nom);  
+  ajouter_fonction(l,"lafonction");  
+  assert(trouver_fonction(l,"lafonction"));
+  assert(trouver_fonction(l,"lol"));
+  assert(trouver_fonction(l,"les")==NULL);
+  ajouter_fonction(l,"lafonctionuno");  
+  assert(trouver_fonction(l,"lafonction"));
+  assert(trouver_fonction(l,"lol"));
+  assert(trouver_fonction(l,"lafonctionuno"));
+  assert(trouver_fonction(l,"les")==NULL);
+  free_List_Var_Global(l);	 
+}
+
+//toutes les fonctions free ont été testés dans les fonctions precedentes
+
 void main(void){
   test_ajouter_fonction();
   test_ajouter_varGlobF();
   test_ajouter_varGlobI();
   test_ajouter_varF();
   test_ajouter_varI();
+  test_ajouter_block();
+  test_trouver_localement();
+  test_trouver_fonction();
 }

@@ -5,23 +5,24 @@
 typedef struct var_global{
   /* Var * top; */
   /* Var * bottom; */
-  List_var *blocs_top;
-  List_var *blocs_bottom;
+  struct list_var *blocs_top;
+  struct list_var *blocs_bottom;
   char type;
   char nom[100];
   struct var_global *next; 
 } Var_Global;
 
 
-typedef struct list_var_global{
+typedef struct list_Var_global{
   Var_Global *top;
   Var_Global *bottom;
-}List_var_Global;
+}List_Var_Global;
 
 typedef struct var {
   char nom[100];
   int offset;
   struct var* next;
+  char type;
 } Var;
 
 typedef struct list_var{
@@ -29,28 +30,29 @@ typedef struct list_var{
   Var *bottom;
   struct list_var *next;
   struct list_var *previous;
-}Liste_var;
+}List_Var;
 
+List_Var_Global *initialiser_list_var_global(void);
 
-void ajouter_fonction(List_Var_Global *l,char *nom);
+List_Var *ajouter_fonction(List_Var_Global *l,char *nom);
 void ajouter_varGlobF(List_Var_Global *l,char *nom);
 void ajouter_varGlobI(List_Var_Global *l,char *nom);
 
-void ajouter_varF(List_Var *l,char *nom);
-void ajouter_varI(List_Var *l,char *nom);
+void ajouter_varF(List_Var *l,char *nom,int offset);
+void ajouter_varI(List_Var *l,char *nom,int offset);
 
-void ajouter_block(Var_Global *l);
+
+List_Var * ajouter_block(Var_Global *l);
 
 /*
-** Permet de trouver une variable dans la fonction et sinon dans la table des variables globales. Dans le cas d'echec retourne null
+** Permet de trouver une variable dans la fonction et sinon dans la table des variables globales. Dans le cas d'echec retourne null. l est le dernier block de la fonction
 */
-Var *trouver(List_var_Glob *lg,List_Var *l,char *nom);
-/*
-** Fonction intermediaire utilisé par la fonction trouver pour chercher une variable global. Retourne null dans le cas d'echec
-*/
-Var_Global *trouver_varGlob(List_Var_Glob *l,char *nom);
+Var *trouver_localement(List_Var *l,char *nom);
 
-Var_Global *trouver_fonction(List_Var_Glob *l,char *nom);
+Var_Global *trouver_Var_Global(List_Var_Global *l,char *nom,int type);
+
+
+Var_Global *trouver_fonction(List_Var_Global *l,char *nom);
 
 List_Var *pop_block(List_Var *l);
 /*
