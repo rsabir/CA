@@ -4,9 +4,9 @@
 void test_ajouter_fonction(void){
   List_Var_Global *l=initialiser_list_var_global();
   char *nom="lol";
-  ajouter_fonction(l,nom);
+  ajouter_fonction(l,nom,1);
   nom="la";
-  ajouter_fonction(l,nom);
+  ajouter_fonction(l,nom,2);
   assert(strcmp(l->top->nom,"lol")==0);
   assert(l->top->blocs_top->next==NULL);
   assert(l->top->blocs_bottom->previous==NULL);
@@ -65,7 +65,7 @@ void test_ajouter_varF(void){
 void test_ajouter_varI(void){
   List_Var_Global *l=initialiser_list_var_global();
   char *nom="lol";
-  List_Var *lol_block=ajouter_fonction(l,nom);  
+  List_Var *lol_block=ajouter_fonction(l,nom,2);  
   ajouter_varI(lol_block,"a",8);
   assert(strcmp(lol_block->top->nom,"a")==0);
   assert(lol_block->top->offset==8);
@@ -83,7 +83,7 @@ void test_ajouter_varI(void){
 void test_ajouter_block(void){
   List_Var_Global *l=initialiser_list_var_global();
   char *nom="lol";
-  ajouter_fonction(l,nom);  
+  ajouter_fonction(l,nom,1);  
   Var_Global *lol=l->top;
   assert(lol->blocs_bottom==lol->blocs_top);
   ajouter_block(lol);
@@ -97,7 +97,7 @@ void test_ajouter_block(void){
 void test_trouver_localement(void){
   List_Var_Global *l=initialiser_list_var_global();
   char *nom="lol";
-  List_Var* lol_block=ajouter_fonction(l,nom);  
+  List_Var* lol_block=ajouter_fonction(l,nom,1);  
   Var_Global *lol=l->top;
   ajouter_varF(lol_block,"a",8);
   ajouter_varI(lol_block,"b",8);
@@ -124,12 +124,12 @@ void test_trouver_localement(void){
 void test_trouver_fonction(void){
   List_Var_Global *l=initialiser_list_var_global();
   char *nom="lol";
-  ajouter_fonction(l,nom);  
-  ajouter_fonction(l,"lafonction");  
+  ajouter_fonction(l,nom,2);  
+  ajouter_fonction(l,"lafonction",2);  
   assert(trouver_fonction(l,"lafonction"));
   assert(trouver_fonction(l,"lol"));
   assert(trouver_fonction(l,"les")==NULL);
-  ajouter_fonction(l,"lafonctionuno");  
+  ajouter_fonction(l,"lafonctionuno",1);  
   assert(trouver_fonction(l,"lafonction"));
   assert(trouver_fonction(l,"lol"));
   assert(trouver_fonction(l,"lafonctionuno"));

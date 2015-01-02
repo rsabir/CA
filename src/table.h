@@ -8,6 +8,7 @@ typedef struct var_global{
   struct list_var *blocs_top;
   struct list_var *blocs_bottom;
   char type;
+  char type_retour;
   char nom[100];
   struct var_global *next; 
 } Var_Global;
@@ -34,7 +35,7 @@ typedef struct list_var{
 
 List_Var_Global *initialiser_list_var_global(void);
 
-List_Var *ajouter_fonction(List_Var_Global *l,char *nom);
+List_Var *ajouter_fonction(List_Var_Global *l,char *nom,char type_retour);
 void ajouter_varGlobF(List_Var_Global *l,char *nom);
 void ajouter_varGlobI(List_Var_Global *l,char *nom);
 
