@@ -5,6 +5,7 @@
 %token <str> IDENTIFIER 
 %token <i> ICONSTANT 
 %token <f> FCONSTANT
+%token ADD SUB TIMES
 %token INC_OP DEC_OP LE_OP GE_OP EQ_OP NE_OP
 %token INT FLOAT VOID
 %token IF ELSE WHILE RETURN FOR MALLOC FREE
@@ -16,9 +17,16 @@
 %start program
 %%
 
+term   : factor           {$$ = $1;}
+        | term TIMES factor  {$$ = mknode($1, $3, TIMES, "*");}
+        ;
+
+factor : NUMBER           {$$ = mknode(0,0, NUMBER, (char *)yylval);}
+        | LEFT_PARENTHESIS exp RIGHT_PARENTHESIS {$$ = $2;}
+
 primary_expression
 : IDENTIFIER { $$ = $1}
-| ICONSTANT 
+| ICONSTANT {$$ = mknode(0,0, ICONSTANT, (char *)yylval);}
 | FCONSTANT
 | '(' expression ')'
 | IDENTIFIER '(' ')'
@@ -41,13 +49,13 @@ unary_expression
 
 multiplicative_expression
 : unary_expression
-| multiplicative_expression '*' unary_expression
+| multiplicative_expression '*' unary_expression $$ = mknode($1, $3, TIMES, "*"); 
 ;
 
 additive_expression
 : multiplicative_expression
-| additive_expression '+' multiplicative_expression
-| additive_expression '-' multiplicative_expression
+| additive_expression '+' multiplicative_expression  $$ = mknode($1, $3, ADD, "+"); 
+| additive_expression '-' multiplicative_expression  $$ = mknode($1, $3, SUB, "-");
 ;
 
 comparison_expression
