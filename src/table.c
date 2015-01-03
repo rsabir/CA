@@ -56,12 +56,22 @@ Var* ajouter_var(List_Var *l, char *nom,int offset){
   return tmp;
 }
 void ajouter_varF(List_Var *l,char *nom,int offset){
-  Var *tmp=ajouter_var(l,nom,offset);
+  if (offset==0){
+    l->offset-=4;
+    Var *tmp=ajouter_var(l,nom,l->offset);
+  }
+  else
+    Var *tmp=ajouter_var(l,nom,offset);
   tmp->type=2;
 }
 
 void ajouter_varI(List_Var *l,char *nom,int offset){
-  Var *tmp=ajouter_var(l,nom,offset);
+  if (offset==0){
+    l->offset-=4;
+    Var *tmp=ajouter_var(l,nom,l->offset);
+  }
+ else
+    Var *tmp=ajouter_var(l,nom,offset);
   tmp->type=1;
 }
 
@@ -118,7 +128,7 @@ Var_Global *trouver_Var_Global(List_Var_Global *l,char *nom,int type){
    return curseur;
 }
 
-Var_Global *trouver_varGlob(List_Var_Global *l,char *nom){
+Var_Global *trouver_var_glob(List_Var_Global *l,char *nom){
   return trouver_Var_Global(l,nom,1);
 }
 

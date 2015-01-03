@@ -29,6 +29,7 @@ typedef struct var {
 typedef struct list_var{
   Var *top;
   Var *bottom;
+  int offset;
   struct list_var *next;
   struct list_var *previous;
 }List_Var;
@@ -51,6 +52,7 @@ List_Var * ajouter_block(Var_Global *l);
 Var *trouver_localement(List_Var *l,char *nom);
 
 Var_Global *trouver_Var_Global(List_Var_Global *l,char *nom,int type);
+Var_Global *trouver_var_glob(List_Var_Global *l,char *nom);
 
 
 Var_Global *trouver_fonction(List_Var_Global *l,char *nom);
