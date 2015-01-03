@@ -27,8 +27,8 @@ int check_type ();
 
 {L}({L}|{D})*	{ count(); yylval.str=strdup(yytext); return(IDENTIFIER); }
 
-{D}+    	{ count(); yylval.str=strdup(yytext); return(ICONSTANT); }
-{D}+"."{D}*     { count(); yylval.str=strdup(yytext); return(FCONSTANT);}
+{D}+    	{ count(); yylval.i=(int)yytext; return(ICONSTANT); }
+{D}+"."{D}*     { count(); yylval.f=(float)yytext; return(FCONSTANT);}
 "++"		{ count(); return(INC_OP); }
 "--"		{ count(); return(DEC_OP); }
 "<="		{ count(); return(LE_OP); }
