@@ -31,15 +31,21 @@ List_Var *ajouter_fonction(List_Var_Global *l,char *nom,char type_retour){
   return tmp->blocs_top;
 }
 
-void ajouter_varGlobF(List_Var_Global *l,char *nom){
+void ajouter_varGlobF(List_Var_Global *l,char *nom,char pointeur){
   Var_Global * tmp=ajouter_varGlob(l,nom);
-  tmp->type=2;
+  if (pointeur==0)
+    tmp->type=2;
+  else 
+    tmp->type=4;
   tmp->type_retour=-1;
 }
 
-void ajouter_varGlobI(List_Var_Global *l,char *nom){
+void ajouter_varGlobI(List_Var_Global *l,char *nom,char pointeur){
   Var_Global * tmp=ajouter_varGlob(l,nom);
-  tmp->type=1;
+  if (pointeur==0)
+    tmp->type=1;
+  else
+    tmp->type=3;
   tmp->type_retour=-1;
 }
 
@@ -55,24 +61,47 @@ Var* ajouter_var(List_Var *l, char *nom,int offset){
   l->bottom=tmp; 
   return tmp;
 }
-void ajouter_varF(List_Var *l,char *nom,int offset){
+void ajouter_varF(List_Var *l,char *nom,int offset,char pointeur){
   if (offset==0){
-    l->offset-=4;
+    if (pointeur==0)
+      l->offset-=4;
+    else
+      l->offset-=8;
     Var *tmp=ajouter_var(l,nom,l->offset);
+    if (pointeur==0)
+      tmp->type=2;
+    else
+      tmp->type=4;
   }
-  else
+  else{
     Var *tmp=ajouter_var(l,nom,offset);
-  tmp->type=2;
+    if (pointeur==0)
+      tmp->type=2;
+    else
+      tmp->type=4;
+  }
+ 
 }
 
-void ajouter_varI(List_Var *l,char *nom,int offset){
+void ajouter_varI(List_Var *l,char *nom,int offset,char pointeur){
   if (offset==0){
-    l->offset-=4;
+    if (pointeur==0)
+      l->offset-=4;
+    else
+      l->offset-=8;
     Var *tmp=ajouter_var(l,nom,l->offset);
+     if (pointeur==0)
+      tmp->type=1;
+    else
+      tmp->type=3;
   }
- else
+  else{
     Var *tmp=ajouter_var(l,nom,offset);
-  tmp->type=1;
+    if (pointeur==0)
+      tmp->type=1;
+    else
+      tmp->type=3;
+  }
 }
 
 List_Var * ajouter_block(Var_Global *l ){

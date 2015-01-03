@@ -4,6 +4,7 @@
   #define TIMES '*'
   #define SUB '-'
   #define AFF '='
+  char in_fonction=0;
 %}
 
 %token <str> IDENTIFIER 
@@ -11,7 +12,9 @@
 %token <f> FCONSTANT
 %token INC_OP DEC_OP LE_OP GE_OP EQ_OP NE_OP
 %token INT FLOAT VOID
+%token IDENTIFIERD
 %token IF ELSE WHILE RETURN FOR MALLOC FREE
+%token DECLARATOR 
 %union {
   char *str;
   float f;
@@ -22,8 +25,8 @@
 
 primary_expression
 : IDENTIFIER { $$ = $1}
-| ICONSTANT {$$ = mknode(0,0, ICONSTANT, (char *)yylval);}
-| FCONSTANT {$$ = mknode(0,0, FCONSTANT, (char *)yylval);}
+| ICONSTANT {$$ = mknode(0,0, ICONSTANT, yylval.i);}
+| FCONSTANT {$$ = mknode(0,0, FCONSTANT, yylval.f);}
 | '(' expression ')'
 | IDENTIFIER '(' ')'
 | IDENTIFIER '(' argument_expression_list ')'
@@ -45,7 +48,7 @@ unary_expression
 
 multiplicative_expression
 : unary_expression
-| multiplicative_expression '*' unary_expression $$ = mknode($1, $3, TIMES, "*"); 
+     | multiplicative_expression '*' unary_expression  {$$=mknode($1, $3, TIMES, "*")}; 
 ;
 
 additive_expression
@@ -65,7 +68,7 @@ comparison_expression
 ;
 
 expression
-: IDENTIFIER '=' comparison_expression
+: IDENTIFIER '=' comparison_expression {mknod($1,$3,AFF,"=");}
 | IDENTIFIER '[' expression ']' '=' comparison_expression
 | comparison_expression
 ;
@@ -80,13 +83,13 @@ declarator_list
 ;
 
 type_name
-: VOID 
-| INT  
-| FLOAT
+: VOID {mknod(0,0,VOID,"void");}
+| INT  {mknod(0,0,INT,"int");}
+| FLOAT {mknod(0,0,FLOAT,"FLOAT");}
 ;
 
 declarator
-: IDENTIFIER  
+: IDENTIFIER {mknod(0,0,DECLARATOR,yylval.str);}  
 | '*' IDENTIFIER
 | IDENTIFIER '[' ICONSTANT ']'
 | declarator '(' parameter_list ')'
@@ -99,7 +102,7 @@ parameter_list
 ;
 
 parameter_declaration
-: type_name declarator
+  : type_name declarator {$1->left=0; $1->right=$2;}
 ;
 
 statement
@@ -130,6 +133,7 @@ expression_statement
 : ';'
 | expression ';'
 ;
+
 
 selection_statement
 : IF '(' expression ')' statement
@@ -169,6 +173,9 @@ extern FILE *yyin;
 
 char *file_name = NULL;
 
+void trouver (char *nom){
+
+}
 void yyerror (char *s) {
     fflush (stdout);
     fprintf (stderr, "%s:%d:%d: %s\n", file_name, yylineno, column, s);
