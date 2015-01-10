@@ -20,6 +20,7 @@
    %token DECLARATOR 
    %type <t> primary_expression multiplicative_expression unary_expression additive_expression comparison_expression type_name  program external_declaration
  function_definition compound_statement declaration  declarator  declarator_list parameter_list parameter_declaration statement_list expression 
+
  
 %union {
   char *str;
@@ -77,7 +78,7 @@ comparison_expression
 expression
 : IDENTIFIER '=' comparison_expression {
   node *n=mknode(0,0,IDENTIFIER,$1); 
-  mknode(n,$3,AFF,"=");
+  $$=mknode(n,$3,AFF,"=");
 }
 | IDENTIFIER '[' expression ']' '=' comparison_expression {$$=$3;}//faux
 | comparison_expression
