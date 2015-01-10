@@ -91,7 +91,7 @@ declaration
 
 declarator_list
 : declarator
-| declarator_list ',' declarator
+| declarator_list ',' declarator  {$$=mknode($1,$3,COMMA,",");}
 ;
 
 type_name
@@ -117,7 +117,7 @@ declarator
 
 parameter_list
 : parameter_declaration
-| parameter_list ',' parameter_declaration
+| parameter_list ',' parameter_declaration 
 ;
 
 parameter_declaration

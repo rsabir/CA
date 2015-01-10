@@ -133,6 +133,8 @@ Var *trouver_localement(List_Var *l,char *nom){
   if (strcmp(curseur->nom,nom)){
     if (l->previous!=NULL)
       return trouver_localement(l->previous,nom);
+    else 
+      return NULL; //a verifier
   }else
     return curseur;
 }
