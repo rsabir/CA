@@ -84,7 +84,7 @@ expression
 ;
 
 declaration
-: type_name declarator_list ';' {printf("%d %d\n",$1,$2); /*$1->left=0; $1->right=$2;*/}
+: type_name declarator_list ';' { $1->left=0; $1->right=$2;}
 ;
 
 declarator_list
@@ -93,16 +93,16 @@ declarator_list
 ;
 
 type_name
-: VOID {mknode(0,0,VOID,"void");}
-| VOIDE {mknode(0,0,VOIDE,"void *");}
-| INT  {mknode(0,0,INT,"int");}
-| INTE  {mknode(0,0,INTE,"int *");}
-| FLOAT {mknode(0,0,FLOAT,"FLOAT");}
-| FLOATE {mknode(0,0,FLOATE,"FLOAT*");}
+: VOID {$$=mknode(0,0,VOID,"void");}
+| VOIDE {$$=mknode(0,0,VOIDE,"void *");}
+| INT  {$$=mknode(0,0,INT,"int");}
+| INTE  {$$=mknode(0,0,INTE,"int *");}
+| FLOAT {$$=mknode(0,0,FLOAT,"FLOAT");}
+| FLOATE {$$=mknode(0,0,FLOATE,"FLOAT*");}
 ;
 
 declarator
-: IDENTIFIER {mknode(0,0,DECLARATOR,yylval.str);}  
+: IDENTIFIER {$$=mknode(0,0,DECLARATOR,yylval.str);}  
 | '*' IDENTIFIER {
   char name[100]={};
   sprintf(name,"*%s",yylval.str);
@@ -119,7 +119,7 @@ parameter_list
 ;
 
 parameter_declaration
-  : type_name declarator
+: type_name declarator
 ;
 
 statement

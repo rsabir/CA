@@ -5,9 +5,12 @@ L[a-zA-Z_]
 #include <stdio.h>
 #include <string.h>
 #include "parser.tab.h"
+#include "arbre.h"
+#include "table.h"
 void count();
 int comment ();
 int check_type ();
+int column = 0;
 %}
 
 %option yylineno
@@ -27,8 +30,8 @@ int check_type ();
 
 {L}({L}|{D})*	{ count(); yylval.str=strdup(yytext); return(IDENTIFIER); }
 
-{D}+    	{ count(); yylval.i=(int)yytext; return(ICONSTANT); }
-{D}+"."{D}*     { count(); yylval.f=(float)yytext; return(FCONSTANT);}
+{D}+    	{ count(); yylval.i=atoi(yytext); return(ICONSTANT); }
+{D}+"."{D}*     { count(); yylval.f=atof(yytext); return(FCONSTANT);}
 "++"		{ count(); return(INC_OP); }
 "--"		{ count(); return(DEC_OP); }
 "<="		{ count(); return(LE_OP); }
@@ -52,7 +55,8 @@ int check_type ();
 "*"		{ count(); return('*'); }
 "<"		{ count(); return('<'); }
 ">"		{ count(); return('>'); }
-[ \t\v\n\f]	{ count(); }
+"\n"            {yylineno++;column=0;};
+[\t\v\n\f]	{ count(); }
 .		{ ;/* ignore bad characters */ }
 
 %%
@@ -74,7 +78,7 @@ loop:
 }
 
 
-extern int column = 0;
+
 
 void count() {
 	int i;

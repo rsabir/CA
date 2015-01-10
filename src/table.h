@@ -1,3 +1,7 @@
+#ifndef table
+#define table
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -68,3 +72,5 @@ void free_Var_Global(Var_Global* v);
 void free_fonction(List_Var_Global *lg, char *nom);
 
 void free_List_Var_Global(List_Var_Global *lg);
+
+#endif

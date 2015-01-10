@@ -1,5 +1,7 @@
 #include "table.h"
 
+extern char in_fonction;
+
 List_Var_Global *initialiser_list_var_global(void){
   List_Var_Global *l=malloc(sizeof(List_Var_Global));
   l->top=NULL;
@@ -125,14 +127,14 @@ List_Var * ajouter_block(Var_Global *l ){
 
 Var *trouver_localement(List_Var *l,char *nom){
   Var *curseur= l->top;
-   while(strcmp(curseur->nom,nom) && curseur->next!=0){
-     curseur=curseur->next;
-   }
-   if (strcmp(curseur->nom,nom)){
-     if (l->previous!=NULL)
-       return trouver_localement(l->previous,nom);
-   }else
-     return curseur;
+  while(strcmp(curseur->nom,nom) && curseur->next!=0){
+    curseur=curseur->next;
+  }
+  if (strcmp(curseur->nom,nom)){
+    if (l->previous!=NULL)
+      return trouver_localement(l->previous,nom);
+  }else
+    return curseur;
 }
 
 Var_Global *trouver_Var_Global(List_Var_Global *l,char *nom,int type){
