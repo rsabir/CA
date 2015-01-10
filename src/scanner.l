@@ -6,7 +6,6 @@ L[a-zA-Z_]
 #include <string.h>
 #include "parser.tab.h"
 #include "arbre.h"
-#include "table.h"
 void count();
 int comment ();
 int check_type ();

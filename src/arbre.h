@@ -1,4 +1,3 @@
-
 extern char in_fonction;
 
 #include "table.h"
@@ -8,6 +7,9 @@ extern char in_fonction;
 #define AFF '='
 #define COMMA ','
  
+extern List_Var_Global *L;
+extern List_Var *l;
+
 
 typedef struct node  {
     struct node *left;
@@ -28,4 +30,4 @@ typedef struct node  {
   
 node *mknode(node *left, node *right, int tokcode, char *token);
 void printtree(node *tree);
-void generate(node *tree,List_Var *l, List_Var_Global *L, char in_fonction);
+void generate(node *tree,List_Var *l, List_Var_Global *L);

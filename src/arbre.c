@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "table.h"
 #include "arbre.h"
 #include "parser.tab.h" 
 
@@ -86,16 +85,16 @@ void ajouter_declaration(node *t, List_Var *l, List_Var_Global *L, int type){
   
 }
 
-void generate(node *tree, List_Var *l, List_Var_Global *L,char in_fonction)
+void generate(node *tree, List_Var *l, List_Var_Global *L)
 {
   //int i;
 
   /* generate the code for the left side */
   if (tree->left)
-    generate(tree->left,l,L,in_fonction);
+    generate(tree->left,l,L);
   /* generate the code for the right side */
   if (tree->right)
-    generate(tree->right,l,L,in_fonction);
+    generate(tree->right,l,L);
 
   /* generate code for this node */
   
@@ -106,7 +105,8 @@ void generate(node *tree, List_Var *l, List_Var_Global *L,char in_fonction)
     break;
     
   case ICONSTANT:
-    /* push the number onto the stack */
+    tree->reg=malloc(100*sizeof(char));
+    sprintf(tree->reg,"$%s",tree->token);
     if (tree->position==1)//le noeud est un fils guache du noeud pere
       printf("mov %s,%%eax\n",tree->reg);
     else //le noeud est un fils droit
@@ -121,11 +121,11 @@ void generate(node *tree, List_Var *l, List_Var_Global *L,char in_fonction)
   case IDENTIFIER :
     {
       Var *v;
-      if (v=trouver_localement(l,tree->token)){
+      if ( l!=NULL && (v=trouver_localement(l,tree->token)!=NULL)){
 	if (tree->position==1)
-	  printf("mov %d(%%rbp),%%eax",v->offset);  
+	  printf("mov %d(%%rbp),%%eax\n",v->offset);  
 	else 
-	  printf("mov %d(%%rbp),%%ebx",v->offset);  
+	  printf("mov %d(%%rbp),%%ebx\n",v->offset);  
 	char nom[100];
 	sprintf(nom,"%d(%%rbp)",v->offset);
 	tree->reg=strdup(v->nom);
@@ -134,9 +134,9 @@ void generate(node *tree, List_Var *l, List_Var_Global *L,char in_fonction)
 	Var_Global* V;
 	if (V=trouver_var_glob(L,tree->token)){
 	  if (tree->position==1)
-	    printf("mov %s,%%eax",V->nom);
+	    printf("mov %s,%%eax\n",V->nom);
 	  else 
-	    printf("mov %s,%%ebx",V->nom);
+	    printf("mov %s,%%ebx\n",V->nom);
 	  tree->reg=strdup(V->nom);
 	}
 	else{
@@ -155,6 +155,9 @@ void generate(node *tree, List_Var *l, List_Var_Global *L,char in_fonction)
 	ajouter_declaration(f,l,L,1);
       break;
     }
+    
+  case DECLARATOR:
+    break;
 
   case ADD:      
     printf("add %%ebx,%%eax\n");
@@ -170,15 +173,18 @@ void generate(node *tree, List_Var *l, List_Var_Global *L,char in_fonction)
     /*   ajouter_declaration(tree->left, l, L, type); */
     /* } */
     /* else */
-      yyerror("erreur de syntaxe"); 
-    printf("mov %%ebx,%s\n",tree->left->reg);
+      yyerror("erreur d'affectation"); 
+    if (tree->right->position==3)
+      printf("mov %%ecx,%s\n",tree->left->reg);
+    else
+      printf("mov %%ebx,%s\n",tree->left->reg);
     break;
 
   case TIMES:
     break;
 
   case SUB:
-    printf("subl %%ebx,%%eax");
+    printf("subl %%ebx,%%eax\n");
     if (tree->position==3)//fils droit
       printf("movl %%eax,%%ecx\n");    
     break;

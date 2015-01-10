@@ -1,9 +1,10 @@
 %{
 #include <stdio.h>
-#include "table.h"
 #include "arbre.h"
 
   char in_fonction=0;
+  List_Var_Global *L=NULL;
+  List_Var *l=NULL;
 
   int yylex();
   void yyerror(const char *s);
@@ -19,7 +20,7 @@
    %token IF ELSE WHILE RETURN FOR MALLOC FREE
    %token DECLARATOR 
    %type <t> primary_expression multiplicative_expression unary_expression additive_expression comparison_expression type_name  program external_declaration
- function_definition compound_statement declaration  declarator  declarator_list parameter_list parameter_declaration statement_list expression 
+ function_definition compound_statement declaration  declarator  declarator_list parameter_list parameter_declaration statement_list expression expression_statement
 
  
 %union {
@@ -85,7 +86,7 @@ expression
 ;
 
 declaration
-: type_name declarator_list ';' { $1->left=0; $1->right=$2;}
+: type_name declarator_list ';' { $1->left=0; $1->right=$2; $$=$1;}
 ;
 
 declarator_list
@@ -107,11 +108,11 @@ declarator
 | '*' IDENTIFIER {
   char name[100]={};
   sprintf(name,"*%s",yylval.str);
-  mknode(0,0,DECLARATOR,name);
+  $$=mknode(0,0,DECLARATOR,name);
   }  
-| IDENTIFIER '[' ICONSTANT ']'  {mknode(0,0,33,yylval.str);} //faux
-| declarator '(' parameter_list ')'  {mknode(0,0,33,yylval.str);} //faux
-| declarator '(' ')'  {mknode(0,0,33,yylval.str);} //faux
+| IDENTIFIER '[' ICONSTANT ']'  {$$=mknode(0,0,33,yylval.str);} //faux
+| declarator '(' parameter_list ')'  {$$=mknode(0,0,33,yylval.str);} //faux
+| declarator '(' ')'  {$$=mknode(0,0,33,yylval.str);} //faux
 ;
 
 parameter_list
@@ -143,13 +144,13 @@ declaration_list
 ;
 
 statement_list
-  : statement {$$=NULL;}
+: statement {$$=NULL;}
 | statement_list statement  {$$=NULL;}
 ;
 
 expression_statement
-: ';'
-| expression ';'
+: ';' {$$=NULL;}
+| expression ';' {generate($1,l,L);}
 ;
 
 
@@ -175,7 +176,8 @@ program
 
 external_declaration
 : function_definition
-| declaration
+| declaration {generate($1,l,L);}
+| expression_statement
 ;
 
 function_definition
@@ -200,9 +202,10 @@ void yyerror (const char *s) {
 }
 
 
-
 int main (int argc, char *argv[]) {
     FILE *input = NULL;
+    L=initialiser_list_var_global();
+    l=NULL;
     if (argc==2) {
 	input = fopen (argv[1], "r");
 	file_name = strdup (argv[1]);
