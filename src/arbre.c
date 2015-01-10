@@ -3,7 +3,9 @@
 #include <string.h>
 #include "table.h"
 #include "arbre.h"
-#include "parser.tab.h"
+#include "parser.tab.h" 
+
+extern void yyerror(const char *s);
 
 node *mknode(node *left, node *right, int tokcode, char *token)
 {
@@ -14,73 +16,86 @@ node *mknode(node *left, node *right, int tokcode, char *token)
   newnode->left = left;
   newnode->right = right;
   newnode->token = newstr;
-  left->position=1;
-  if (right->tokcode==ICONSTANT || right->tokcode==FCONSTANT)
-    right->position=2;
-  else 
-    right->position=3;
+  if (left!=0)
+    left->position=1;
+  if (right!=0){
+    if (right->tokcode==ICONSTANT || right->tokcode==FCONSTANT)
+      right->position=2;
+    else 
+      right->position=3;
+  }
   newnode->tokcode = tokcode;
   return(newnode);
 }
 
-void ajouter_declaration(tree *t, List_Var *l, List_Var_Global *L, int type,char bf){
-  if(t->left!=NULL && t->right!=NULL){
-    ajouter_declaration(t->left,type,bf);
-    return ajouter_declaration(t->right,type,bf);
-  }
-  if (t->right==NULL)
-    return ajouter_declaration(t->left,type,bf);
-  if (t->left==NULL)
-    return ajouter_declaration(t->right,type,bf);
+void ajouter_declaration(node *t, List_Var *l, List_Var_Global *L, int type){
   
-  switch (type){
+  if (t==NULL){
+    return ;
+  }
+  if (t->tokcode!=COMMA){
+    ajouter_declaration(t->left,l,L,type);
+    ajouter_declaration(t->right,l,L,type);
+  
+    switch (type){
 
-  case 1:
-    if (bf=1){
-      ajouter_varI(l,t->token,0,0);
-      printf("sub $4,%%rsp\n");
-      return;
+    case 1:
+      if (in_fonction==1){
+	ajouter_varI(l,t->token,0,0);
+	printf("sub $4,%%rsp\n");
+	return;
+      }
+      else {
+	ajouter_varGlobI(L,t->token,0);
+      }
+      break;
+
+    case 2:
+      if (in_fonction==1){
+	ajouter_varF(l,t->token,0,0);
+	return;
+      }
+      else {
+	ajouter_varGlobF(L,t->token,0);
+	return ;
+      }
+      break;
+
+    case 3:
+      if (in_fonction==1){
+	ajouter_varI(l,t->token,0,1);
+	return;
+      }
+      else {
+	 ajouter_varGlobI(L,t->token,1);
+	 return;
+      }
+      break;
+
+    case 4:
+      if (in_fonction==1){
+	ajouter_varF(l,t->token,0,1);
+	return;
+      }
+      else {
+	ajouter_varGlobF(L,t->token,1);
+      }
+      break;    
     }
-    else {
-      ajouter_varGlobI(L,t->token,0);
-    }
-    break;
-
-  case 2:
-    if (bf=1)
-      return ajouter_varF(l,t->token,0,0);
-    else 
-      return ajouter_varGlobF(L,t->token,0);
-    break;
-
-  case 3:
-    if (bf=1)
-      return ajouter_varI(l,t->token,0,1);
-    else 
-      return ajouter_varGlobI(L,t->token,1);
-    break;
-
-  case 4:
-    if (bf=1)
-      return ajouter_varF(l,t->token,0,1);
-    else 
-      return ajouter_varGlobF(L,t->token,0,1);
-    break;
-    
   }
   
 }
 
-void generate(node *tree, List_Var *l, List_Var_Global *L)
+void generate(node *tree, List_Var *l, List_Var_Global *L,char in_fonction)
 {
-  int i;
+  //int i;
 
   /* generate the code for the left side */
   if (tree->left)
-    generate(tree->left,l,L);
+    generate(tree->left,l,L,in_fonction);
   /* generate the code for the right side */
   if (tree->right)
-    generate(tree->right,l,L);
+    generate(tree->right,l,L,in_fonction);
 
   /* generate code for this node */
   
@@ -135,12 +150,11 @@ void generate(node *tree, List_Var *l, List_Var_Global *L)
       break;
     }
   case INT:
-    if (in_fonction==0){
-      tree *f=tree->right;
-      ajouter_varGlobI(L,)
+    {
+      node *f=tree->right;
+	ajouter_declaration(f,l,L,1);
+      break;
     }
-    break;
-  
 
   case ADD:      
     printf("add %%ebx,%%eax\n");
@@ -150,22 +164,23 @@ void generate(node *tree, List_Var *l, List_Var_Global *L)
     break;
 
   case AFF:
-    if (tree->left->tokcode==IDENTIFIER){
-      char *registre=tree->left->reg;
-    }
-    else
-      yyerror("erreur de syntaxe");
+    if (tree->left->tokcode!=IDENTIFIER)//{
+    /*   char *registre=tree->left->reg; */
+    /*   int type = tree->left->tokcode; */
+    /*   ajouter_declaration(tree->left, l, L, type); */
+    /* } */
+    /* else */
+      yyerror("erreur de syntaxe"); 
     printf("mov %%ebx,%s\n",tree->left->reg);
-    break;
-  case MINUS:
-   
     break;
 
   case TIMES:
-    printf("POP A\n");
-    printf("POP B\n");
-    printf("MULT A= A*B\n");
-    printf("PUSH A\n");
+    break;
+
+  case SUB:
+    printf("subl %%ebx,%%eax");
+    if (tree->position==3)//fils droit
+      printf("movl %%eax,%%ecx\n");    
     break;
 
   default:
