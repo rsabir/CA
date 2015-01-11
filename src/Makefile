@@ -5,7 +5,7 @@ CC=gcc -g
 
 all: parser
 
-parser:parser.c scanner.c table.c arbre.c
+parser:parser.c scanner.c table.c arbre.c list.c
 	$(CC) $(CFLAGS) -o $@ $^
 
 parser.c:parser.y

@@ -1,11 +1,13 @@
 %{
 #include <stdio.h>
+#include "list.h"
 #include "arbre.h"
 
   char in_fonction=0;
-  List_Var_Global *L=NULL;
-  List_Var *l=NULL;
-
+  List_Var_Global *L=NULL; //liste des variables globales
+  List_Var *l=NULL; //liste des variables locales
+  List *le=NULL;  //liste contenant du codes assembleur des variables globales
+  
   int yylex();
   void yyerror(const char *s);
   
@@ -199,6 +201,7 @@ void trouver (char *nom){
 void yyerror (const char *s) {
     fflush (stdout);
     fprintf (stderr, "%s:%d:%d: %s\n", file_name, yylineno, column, s);
+    exit(1);
 }
 
 
@@ -206,6 +209,7 @@ int main (int argc, char *argv[]) {
     FILE *input = NULL;
     L=initialiser_list_var_global();
     l=NULL;
+    le=list_initialise();
     if (argc==2) {
 	input = fopen (argv[1], "r");
 	file_name = strdup (argv[1]);
@@ -221,7 +225,10 @@ int main (int argc, char *argv[]) {
     }
     else {
 	fprintf (stderr, "%s: error: no input file\n", *argv);
+	list_free(le);
 	return 1;
     }
+    list_print(le);
+    list_free(le);
     return 0;
 }
