@@ -21,8 +21,11 @@
    %token INT FLOAT VOID INTE VOIDE FLOATE
    %token IF ELSE WHILE RETURN FOR MALLOC FREE
    %token DECLARATOR 
-   %type <t> primary_expression multiplicative_expression unary_expression additive_expression comparison_expression type_name  program external_declaration
- function_definition compound_statement declaration  declarator  declarator_list parameter_list parameter_declaration statement_list expression expression_statement
+
+   %type <t> primary_expression multiplicative_expression unary_expression additive_expression 
+   %type <t> comparison_expression type_name  program external_declaration
+   %type <t> function_definition compound_statement declaration  declarator  declarator_list
+   %type <t> parameter_list parameter_declaration statement_list expression expression_statement
 
  
 %union {
@@ -43,7 +46,7 @@ primary_expression
 | IDENTIFIER '(' argument_expression_list ')'  { $$ = mknode(0,0, 333, yylval.str);} //faux
 | IDENTIFIER INC_OP  { $$ = mknode(0,0, 333, yylval.str);} //faux
 | IDENTIFIER DEC_OP  { $$ = mknode(0,0, 333, yylval.str); }//faux 
-| IDENTIFIER '[' expression ']'  { $$ = mknode(0,0, 333, yylval.str);} //faux
+| IDENTIFIER '[' expression ']'  {$$ = mknode(0,$3,ARRAY, $1);} 
 ;
 
 argument_expression_list
@@ -112,7 +115,13 @@ declarator
   sprintf(name,"*%s",yylval.str);
   $$=mknode(0,0,DECLARATOR,name);
   }  
-| IDENTIFIER '[' ICONSTANT ']'  {$$=mknode(0,0,33,yylval.str);} //faux
+| IDENTIFIER '[' ICONSTANT ']'  {
+  char nom[100]={0,}; 
+  sprintf(nom,"%d",$3);
+  node *t;
+  t = mknode(0,0,POINTERNB,nom);
+  $$=mknode(0,t,POINTER,$1);
+  } //faux
 | declarator '(' parameter_list ')'  {$$=mknode(0,0,33,yylval.str);} //faux
 | declarator '(' ')'  {$$=mknode(0,0,33,yylval.str);} //faux
 ;
@@ -228,6 +237,7 @@ int main (int argc, char *argv[]) {
 	list_free(le);
 	return 1;
     }
+    printf("\n");
     list_print(le);
     list_free(le);
     return 0;

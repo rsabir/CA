@@ -6,7 +6,10 @@ extern char in_fonction;
 #define SUB '-'
 #define AFF '='
 #define COMMA ','
- 
+#define POINTER 1 
+#define POINTERNB 2
+#define ARRAY 3
+
 extern List_Var_Global *L;
 extern List_Var *l;
 

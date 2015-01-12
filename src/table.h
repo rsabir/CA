@@ -1,10 +1,9 @@
-#ifndef table
-#define table
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+
+
 
 typedef struct var_global{
   /* Var * top; */
@@ -14,6 +13,7 @@ typedef struct var_global{
   char type;
   char type_retour;
   char nom[100];
+  int taille_tableau;
   struct var_global *next; 
 } Var_Global;
 
@@ -28,6 +28,7 @@ typedef struct var {
   int offset;
   struct var* next;
   char type;
+  int taille_tableau;
 } Var;
 
 typedef struct list_var{
@@ -41,11 +42,11 @@ typedef struct list_var{
 List_Var_Global *initialiser_list_var_global(void);
 
 List_Var *ajouter_fonction(List_Var_Global *l,char *nom,char type_retour);
-void ajouter_varGlobF(List_Var_Global *l,char *nom,char pointeur);
-void ajouter_varGlobI(List_Var_Global *l,char *nom,char pointeur);
+void ajouter_varGlobF(List_Var_Global *l,char *nom,int pointeur);
+void ajouter_varGlobI(List_Var_Global *l,char *nom,int  pointeur);
 
-void ajouter_varF(List_Var *l,char *nom,int offset,char pointeur);
-void ajouter_varI(List_Var *l,char *nom,int offset,char pointeur);
+void ajouter_varF(List_Var *l,char *nom,int offset,int pointeur);
+void ajouter_varI(List_Var *l,char *nom,int offset,int pointeur);
 
 
 List_Var * ajouter_block(Var_Global *l);
@@ -72,5 +73,3 @@ void free_Var_Global(Var_Global* v);
 void free_fonction(List_Var_Global *lg, char *nom);
 
 void free_List_Var_Global(List_Var_Global *lg);
-
-#endif

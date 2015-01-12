@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "arbre.h"
+#include "list.h"
 #include "parser.tab.h" 
 
 extern void yyerror(const char *s);
@@ -29,7 +30,7 @@ node *mknode(node *left, node *right, int tokcode, char *token)
 
 void ajouter_declaration(node *t, List_Var *l, List_Var_Global *L, int type){
   
-  if (t==NULL){
+  if (t==NULL || t->tokcode==POINTERNB){
     return ;
   }
 
@@ -37,53 +38,97 @@ void ajouter_declaration(node *t, List_Var *l, List_Var_Global *L, int type){
     ajouter_declaration(t->right,l,L,type);
 
     if (t->tokcode!=COMMA){
+      if (t->tokcode==POINTER){
+	if (type==1) type=3;
+	if (type==2) type=4;
+      }
       switch (type){
-
+	
       case 1:
 	if (in_fonction==1){
 	  ajouter_varI(l,t->token,0,0);
 	  printf("sub $4,%%rsp\n");
-	  return;
 	}
 	else {
 	  ajouter_varGlobI(L,t->token,0);
+	  char expression[100];
+	  sprintf(expression,"%s:   .value   0",t->token);
+	  list_ajouter(le,expression);
 	}
+	return;
 	break;
-
+      
       case 2:
-	if (in_fonction==1){
+	if (in_fonction==1)
 	  ajouter_varF(l,t->token,0,0);
-	  return;
-	}
-	else {
+	else 
 	  ajouter_varGlobF(L,t->token,0);
-	  return ;
-	}
+	return;
 	break;
-
+	
       case 3:
 	if (in_fonction==1){
-	  ajouter_varI(l,t->token,0,1);
-	  return;
+	  if (t->tokcode==POINTER){
+	    if (t->right->tokcode!=POINTERNB){
+	      yyerror("erreur de syntax l");
+	    }
+	    char expression[100];
+	    int of=atoi(t->right->token);
+	    sprintf(expression,"  .comm  %s,%d",t->token,(of-1)*4);
+	    ajouter_varI(l,t->token,0,of);
+	    list_ajouter(le,expression);
+	  }
+	  else 
+	    yyerror("erreur codage pointeur int");
+	}else {
+	  if (t->tokcode==POINTER){
+	    if (t->right->tokcode!=POINTERNB){
+	      yyerror("erreur de syntax l");
+	    }
+	    char expression[100];
+	    int of=atoi(t->right->token);
+	    sprintf(expression,"  .comm  %s,%d",t->token,(of-1)*4);
+	    ajouter_varGlobI(L,t->token,of);
+	    list_ajouter(le,expression);
+	  }
+	  else
+	    yyerror("erreur codage pointeur int");
 	}
-	else {
-	  ajouter_varGlobI(L,t->token,1);
-	  return;
-	}
+	return;
 	break;
 
-      case 4:
-	if (in_fonction==1){
-	  ajouter_varF(l,t->token,0,1);
-	  return;
+    case 4:
+      if (in_fonction==1){
+	if (t->tokcode==POINTER){
+	  if (t->right->tokcode!=POINTERNB){
+	    yyerror("erreur de syntax");
+	  }
+	  char expression[100];
+	  int of=atoi(t->right->token);
+	  sprintf(expression,"  .comm  %s,%d",t->token,(of-1)*4);
+	  ajouter_varF(l,t->token,0,of);
+	  list_ajouter(le,expression);
 	}
-	else {
-	  ajouter_varGlobF(L,t->token,1);
-	}
-	break;    
+	else 
+	  yyerror("erreur codage pointeur float");
       }
-  }
-  
+      else {
+	  if (t->tokcode==POINTER){
+	    if (t->right->tokcode!=POINTERNB){
+	      yyerror("erreur de syntax");
+	    }
+	    char expression[100];
+	    int of=atoi(t->right->token);
+	    sprintf(expression,"  .comm  %s,%d",t->token,(of-1)*4);
+	    ajouter_varGlobF(L,t->token,of);
+	    list_ajouter(le,expression);
+	  }
+	else 
+	  yyerror("erreur codage pointeur float");
+      }
+      break;    
+      }
+    }
 }
 
 void generate(node *tree, List_Var *l, List_Var_Global *L)
@@ -200,9 +245,15 @@ void generate(node *tree, List_Var *l, List_Var_Global *L)
     if (tree->position==3)//fils droit
       printf("movl %%eax,%%ecx\n");    
     break;
-    
+
   case COMMA:
     break;
+
+  case POINTER:
+    break;
+  case POINTERNB:
+    break;
+
   default:
     printf("error unkown AST code %d\n", tree->tokcode);
   }

@@ -33,21 +33,25 @@ List_Var *ajouter_fonction(List_Var_Global *l,char *nom,char type_retour){
   return tmp->blocs_top;
 }
 
-void ajouter_varGlobF(List_Var_Global *l,char *nom,char pointeur){
+void ajouter_varGlobF(List_Var_Global *l,char *nom,int pointeur){
   Var_Global * tmp=ajouter_varGlob(l,nom);
-  if (pointeur==0)
+  if (pointeur==0){
     tmp->type=2;
+    tmp->taille_tableau=pointeur;
+  }
   else 
     tmp->type=4;
   tmp->type_retour=-1;
 }
 
-void ajouter_varGlobI(List_Var_Global *l,char *nom,char pointeur){
+void ajouter_varGlobI(List_Var_Global *l,char *nom,int pointeur){
   Var_Global * tmp=ajouter_varGlob(l,nom);
   if (pointeur==0)
     tmp->type=1;
-  else
+  else{
     tmp->type=3;
+    tmp->taille_tableau=pointeur;
+  }
   tmp->type_retour=-1;
 }
 
@@ -63,46 +67,58 @@ Var* ajouter_var(List_Var *l, char *nom,int offset){
   l->bottom=tmp; 
   return tmp;
 }
-void ajouter_varF(List_Var *l,char *nom,int offset,char pointeur){
+void ajouter_varF(List_Var *l,char *nom,int offset,int pointeur){
   if (offset==0){
-    if (pointeur==0)
-      l->offset-=4;
-    else
-      l->offset-=8;
     Var *tmp=ajouter_var(l,nom,l->offset);
-    if (pointeur==0)
+    if (pointeur==0){
+      l->offset-=4;
       tmp->type=2;
-    else
+     tmp->taille_tableau=0;
+    }
+    else{
       tmp->type=4;
+      l->offset-=pointeur*4;
+      tmp->taille_tableau=pointeur;
+    }
   }
   else{
     Var *tmp=ajouter_var(l,nom,offset);
-    if (pointeur==0)
+    if (pointeur==0){
+      tmp->taille_tableau=0;
       tmp->type=2;
-    else
+    }
+    else{
       tmp->type=4;
-  }
+      tmp->taille_tableau=pointeur;
+    }
  
+  }
 }
 
-void ajouter_varI(List_Var *l,char *nom,int offset,char pointeur){
+void ajouter_varI(List_Var *l,char *nom,int offset,int pointeur){
   if (offset==0){
-    if (pointeur==0)
-      l->offset-=4;
-    else
-      l->offset-=8;
     Var *tmp=ajouter_var(l,nom,l->offset);
-     if (pointeur==0)
+    if (pointeur==0){
+      l->offset-=4;
       tmp->type=1;
-    else
+      tmp->taille_tableau=0;
+    }
+    else{
       tmp->type=3;
+      l->offset-=pointeur*4;
+      tmp->taille_tableau=pointeur;
+    }
   }
   else{
     Var *tmp=ajouter_var(l,nom,offset);
-    if (pointeur==0)
+    if (pointeur==0){
       tmp->type=1;
-    else
+      tmp->taille_tableau=0;
+    }
+    else{
       tmp->type=3;
+      tmp->taille_tableau=pointeur;
+    }
   }
 }
 
@@ -121,7 +137,8 @@ List_Var * ajouter_block(Var_Global *l ){
     tmp->previous=l->blocs_bottom;
     tmp->next=NULL;
     l->blocs_bottom=tmp;
-  }   
+  }
+  tmp->offset=-4;
   return tmp;
 }
 
